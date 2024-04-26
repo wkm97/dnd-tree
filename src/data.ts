@@ -16,11 +16,31 @@ export const exampleSections: Section[] = [
       {
         id: 'section_2b',
         title: 'Section 2B',
+        sections: [
+          {
+            id: 'section_2b.a',
+            title: 'Section 2B.A',
+          }
+        ]
+      },
+      {
+        id: 'section_2c',
+        title: 'Section 2C',
       }
     ]
   },
   {
     id: 'section_3',
-    title: 'Section 3'
+    title: 'Section 3',
+    sections: [
+      {
+        id: 'section_3a',
+        title: 'Section 3A',
+      },
+      {
+        id: 'section_3b',
+        title: 'Section 3B',
+      }
+    ]
   },
 ]
