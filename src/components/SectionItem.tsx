@@ -1,5 +1,5 @@
 import { DragHandleIcon } from "@chakra-ui/icons"
-import { AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, Box, HStack, IconButton } from "@chakra-ui/react"
+import { AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, Box, IconButton } from "@chakra-ui/react"
 import { Section } from "../types"
 import { forwardRef } from "react";
 

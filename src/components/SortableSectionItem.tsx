@@ -10,10 +10,9 @@ interface SortableSectionItemProps {
   section: Section
   activeId: UniqueIdentifier
   parentId?: UniqueIdentifier
-  sections: Section[]
 }
 
-export const SortableSectionItem = ({ section, activeId, parentId, sections }: SortableSectionItemProps) => {
+export const SortableSectionItem = ({ section, activeId, parentId }: SortableSectionItemProps) => {
   const { id } = section;
   const {
     attributes,
@@ -40,17 +39,19 @@ export const SortableSectionItem = ({ section, activeId, parentId, sections }: S
   };
 
   return (
-    <Box ref={setNodeRef} style={style}>
-      <SectionItem
-        section={section}
-        ref={setActivatorNodeRef}
-        {...listeners}
-        {...attributes}
-      >
-        {!isDragging &&
-          <SortableSections activeId={activeId} sections={section.sections || []} allSections={sections} />
-        }
-      </SectionItem>
+    <Box data-testid="sectionItem-box" ref={setNodeRef} style={style}>
+      {isDragging ? <Box height={3}></Box> :
+        <SectionItem
+          section={section}
+          ref={setActivatorNodeRef}
+          {...listeners}
+          {...attributes}
+        >
+          {!isDragging &&
+            <SortableSections activeId={activeId} sections={section.sections || []} />
+          }
+        </SectionItem>
+      }
     </Box>
   )
 }

@@ -13,3 +13,9 @@ export interface SectionNode extends Section{
   sections?: SectionNode[]
   parentId?: UniqueIdentifier
 }
+
+export interface FlattenSection extends Section {
+  parentId?: UniqueIdentifier
+  depth: number
+  index: number
+}

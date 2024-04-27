@@ -3,15 +3,15 @@ import { Section } from "../types"
 import { SortableSectionItem } from "./SortableSectionItem"
 import { UniqueIdentifier } from "@dnd-kit/core"
 import { Accordion } from "@chakra-ui/react"
+import { memo } from "react"
 
 interface SortableSectionsProps {
   sections: Section[]
   activeId: UniqueIdentifier
   parentId?: UniqueIdentifier
-  allSections: Section[]
 }
 
-export const SortableSections = ({ sections, activeId, parentId, allSections }: SortableSectionsProps) => {
+export const SortableSections = memo(({ sections, activeId, parentId }: SortableSectionsProps) => {
 
   return (
     <SortableContext items={sections.map(({ id }) => id)} strategy={verticalListSortingStrategy}>
@@ -21,10 +21,9 @@ export const SortableSections = ({ sections, activeId, parentId, allSections }: 
           section={section}
           activeId={activeId}
           parentId={parentId}
-          sections={allSections}
         />
         )}
       </Accordion>
     </SortableContext>
   )
-}
+})
