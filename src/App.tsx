@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Accordion, Box, ChakraProvider, Container } from '@chakra-ui/react'
 import { exampleSections } from './data'
-import { DndContext, DragEndEvent, DragMoveEvent, DragOverEvent, DragOverlay, DragStartEvent, PointerSensor, UniqueIdentifier, closestCenter, rectIntersection, useSensor, useSensors } from '@dnd-kit/core';
+import { DndContext, DragEndEvent, DragMoveEvent, DragOverEvent, DragOverlay, DragStartEvent, PointerSensor, UniqueIdentifier, closestCenter, closestCorners, rectIntersection, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableSections } from './components/SortableSections';
 import { createPortal } from 'react-dom';
 import { sectionNodeMapper, convertRemToPixels, getDragDepth, getSection, getProjection, sectionMapper, moveNode } from './components/utilities';
@@ -18,37 +18,44 @@ function App() {
   const projected =
     activeId && overId
       ? getProjection(
-          sections,
-          activeId,
-          overId,
-          offsetLeft
-        )
+        sections,
+        activeId,
+        overId,
+        offsetLeft
+      )
       : null;
-  
-  useEffect(()=> {
-    if (!activeId || !overId) {
+
+  function handleDragMove({active, over, delta }: DragMoveEvent) {
+    if (!over || !active) {
       return;
     }
 
-    const result = moveNode(nodes, activeId, overId, offsetLeft)
-    setSections(sectionMapper(result))
-
-  }, [activeId, overId, nodes, offsetLeft])
-
-  function handleDragMove({delta}: DragMoveEvent) {
-    setOffsetLeft(delta.x);
+    setSections(sections => {
+      const nodes = sectionNodeMapper(sections)
+      const result = moveNode(nodes, active.id, over.id, delta.x)
+      return sectionMapper(result)
+    })
   }
 
   function handleDragStart({ active: { id: activeId } }: DragStartEvent) {
     setActiveId(activeId);
   }
 
-  function handleDragOver({over}: DragOverEvent) {
-    setOverId(over?.id ?? '');
+  function handleDragOver({active, over, delta }: DragOverEvent) {
+    // if (!over || !active) {
+    //   return;
+    // }
+
+    // setSections(sections => {
+    //   const nodes = sectionNodeMapper(sections)
+    //   const result = moveNode(nodes, active.id, over.id, delta.x)
+    //   return sectionMapper(result)
+    // })
   }
 
-  function handleDragEnd({active, over}: DragEndEvent) {
+  function handleDragEnd({ active, over }: DragEndEvent) {
     setActiveId('')
+    setOffsetLeft(0)
   }
 
   const sensors = useSensors(
@@ -66,9 +73,7 @@ function App() {
           onDragOver={handleDragOver}
           collisionDetection={rectIntersection}
         >
-          <Accordion defaultIndex={[0]} allowMultiple>
-            <SortableSections sections={sections} activeId={activeId} allSections={sections} />
-          </Accordion>
+          <SortableSections sections={sections} activeId={activeId} allSections={sections} />
           {activeSection && createPortal(<DragOverlay>
             <Box as='span' flex='1' textAlign='left' paddingX={2}>
               {activeSection.title}

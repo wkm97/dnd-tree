@@ -66,8 +66,8 @@ export function sectionNodeMapper(sections: Section[], depth = 0, parentId?: Uni
 
 export function sectionMapper(nodes: SectionNode[]): Section[] {
   return nodes.map((node) => {
-    const {sections, ...section} = _.omit(node, ['depth', 'index', 'parentId'])
-    if(sections && sections.length > 0){
+    const { sections, ...section } = _.omit(node, ['depth', 'index', 'parentId'])
+    if (sections && sections.length > 0) {
       return {
         ...section,
         sections: sectionMapper(sections)
@@ -91,11 +91,11 @@ export function getProjection(
   const overSection = getSectionNode(overId, nodes)
   const dragDepth = getDragDepth(dragOffset, INDENTATION_WITDH)
   const projectedDepth = activeSection ? activeSection.depth + dragDepth : 0
-  
+
   const minDepth = overSection ? overSection.depth : 0
   const maxDepth = overSection ? overSection.depth + 1 : 0
   let depth = projectedDepth;
-  
+
   if (projectedDepth >= maxDepth) {
     depth = maxDepth;
   } else if (projectedDepth < minDepth) {
@@ -115,31 +115,31 @@ export function moveNode(
     return sections;
   }
 
-  if(overId === activeId){
+  if (overId === activeId) {
     return sections
   }
 
-  const {depth, parentId} = getProjection(sections, activeId, overId, dragOffset)
+  const { depth, parentId } = getProjection(sections, activeId, overId, dragOffset)
+
   const activeSection = getSectionNode(activeId, sections)
   const overSection = getSectionNode(overId, sections)
   const newSection = removeSection(activeId, sections)
-
-  if(activeSection && overSection && depth === overSection.depth){
-    return insertBefore(activeSection, overId, newSection) as SectionNode[]
+  if (activeSection && overSection && depth === overSection.depth) {
+    return insertAfter(activeSection, overId, newSection) as SectionNode[]
   }
-  console.log(depth, overSection?.depth)
-  if(activeSection && overSection && depth > overSection.depth){
+  if (activeSection && overSection && depth > overSection.depth) {
     return insertSubSession(activeSection, overId, newSection) as SectionNode[]
   }
   return sections
 }
 
-function removeSection(id: UniqueIdentifier, sections: Section[]){
+function removeSection(id: UniqueIdentifier, sections: Section[]) {
   return sections.reduce<Section[]>((updatedSections, section) => {
     if (section.id !== id) {
-      updatedSections.push({ 
-        ...section, 
-        sections: section.sections ? removeSection(id, section.sections) : [] });
+      updatedSections.push({
+        ...section,
+        sections: section.sections ? removeSection(id, section.sections) : []
+      });
     }
     return updatedSections;
   }, []);
@@ -160,7 +160,7 @@ function insertSubSession(sectionInsert: Section, parentId: UniqueIdentifier, se
   }, []);
 }
 
-function insertBefore(sectionInsert: Section, beforeId: UniqueIdentifier, sections: Section[]): Section[]{
+function insertBefore(sectionInsert: Section, beforeId: UniqueIdentifier, sections: Section[]): Section[] {
   return sections.reduce<Section[]>((updatedSections, section) => {
     if (section.id === beforeId) {
       // Insert the new section before the current section
@@ -168,6 +168,21 @@ function insertBefore(sectionInsert: Section, beforeId: UniqueIdentifier, sectio
     } else if (section.sections) {
       // Recursively insert into child sections if overId exists there
       const updatedChildSections = insertBefore(sectionInsert, beforeId, section.sections);
+      return [...updatedSections, { ...section, sections: updatedChildSections }];
+    }
+    // Add the section as is if not the overId or doesn't have child sections
+    return [...updatedSections, section];
+  }, []);
+}
+
+function insertAfter(sectionInsert: Section, afterId: UniqueIdentifier, sections: Section[]): Section[] {
+  return sections.reduce<Section[]>((updatedSections, section) => {
+    if (section.id === afterId) {
+      // Insert the new section before the current section
+      return [...updatedSections, section, sectionInsert];
+    } else if (section.sections) {
+      // Recursively insert into child sections if overId exists there
+      const updatedChildSections = insertAfter(sectionInsert, afterId, section.sections);
       return [...updatedSections, { ...section, sections: updatedChildSections }];
     }
     // Add the section as is if not the overId or doesn't have child sections

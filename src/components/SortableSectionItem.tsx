@@ -47,9 +47,6 @@ export const SortableSectionItem = ({ section, activeId, parentId, sections }: S
         {...listeners}
         {...attributes}
       >
-        {isDragging &&
-          <h1>hello</h1>
-        }
         {!isDragging &&
           <SortableSections activeId={activeId} sections={section.sections || []} allSections={sections} />
         }
